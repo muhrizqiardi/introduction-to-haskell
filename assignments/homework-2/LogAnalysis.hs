@@ -56,3 +56,8 @@ inOrder Leaf = []
 inOrder (Node Leaf node Leaf) = [node]
 inOrder (Node Leaf node r) = inOrder r ++ [node]
 inOrder (Node l node Leaf) = node : inOrder l
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong [] = []
+whatWentWrong ((LogMessage (Error severity) _ msg):xs) =
+  [msg | severity >= 50]
