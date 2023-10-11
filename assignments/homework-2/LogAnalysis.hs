@@ -18,15 +18,15 @@ parseMessage :: String -> LogMessage
 parseMessage msgStr =
   case msgStr of
     "" -> Unknown msgStr
-    ('E' : s) -> 
-      let msgList = split ' ' msgStr 
-      in LogMessage (Error (read (msgList !! 1) :: Int)) (read (msgList !! 2) :: Int) (join " " (drop 3 msgList))
-    ('I' : s) -> 
-      let msgList = split ' ' msgStr 
-      in LogMessage Info (read (msgList !! 1) :: Int) (join " " (drop 2 msgList))
-    ('W' : s) -> 
-      let msgList = split ' ' msgStr 
-      in LogMessage Warning (read (msgList !! 1) :: Int) (join " " (drop 2 msgList))
+    ('E' : s) ->
+      let msgList = split ' ' msgStr
+       in LogMessage (Error (read (msgList !! 1) :: Int)) (read (msgList !! 2) :: Int) (join " " (drop 3 msgList))
+    ('I' : s) ->
+      let msgList = split ' ' msgStr
+       in LogMessage Info (read (msgList !! 1) :: Int) (join " " (drop 2 msgList))
+    ('W' : s) ->
+      let msgList = split ' ' msgStr
+       in LogMessage Warning (read (msgList !! 1) :: Int) (join " " (drop 2 msgList))
 
 parse :: String -> [LogMessage]
 parse "" = []
@@ -39,11 +39,14 @@ getTimeStamp (LogMessage _ timestamp _) = timestamp
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) tree = tree
 insert log Leaf = Node Leaf log Leaf
-insert log tree = 
-  let
-    treeTimeStamp = getTimeStamp ((\(Node _ log _) -> log) tree)
-    logTimeStamp = getTimeStamp log
-  in
-    if logTimeStamp > treeTimeStamp 
-    then Node Leaf log tree
-    else Node tree log Leaf
+insert log tree =
+  let treeTimeStamp = getTimeStamp ((\(Node _ log _) -> log) tree)
+      logTimeStamp = getTimeStamp log
+   in if logTimeStamp > treeTimeStamp
+        then Node Leaf log tree
+        else Node tree log Leaf
+
+build :: [LogMessage] -> MessageTree
+build [] = Leaf
+build [x] = insert x Leaf
+build (x : xs) = insert x (build xs)
